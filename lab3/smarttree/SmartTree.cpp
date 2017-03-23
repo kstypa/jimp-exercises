@@ -47,17 +47,30 @@ namespace datastructures {
     }
 
     unique_ptr <SmartTree> RestoreTree(const string &tree){
-        string value;
-        for(auto ch : tree){
-            if((tree[tree.find(ch)-1] == '[' || isdigit(tree[tree.find(ch)-1])) && ch != ']' && ch != ' '){
-                value += ch;
-                if(value == "none")
-                    return nullptr;
+        size_t separator = 0;
+        std::regex pattern {R"(\[(-*\d+|none)\s(.*))"};
+        std::smatch matches;
+        unique_ptr<SmartTree> leaf;
+        if(std::regex_match(tree, matches, pattern)){
+            string children = matches[2].str();
+            for(size_t i = 0; i < children.size(); i++){
+                if(children[i] == '[')
+                    separator++;
+                else if(children[i] == ']')
+                    separator--;
+                else if(separator == 0){
+                    separator = i;
+                    break;
+                }
             }
+            string left = children.substr(0, separator);
+            string right = children.substr(separator + 1, children.size()-1);
+
+            leaf = CreateLeaf(std::stoi(matches[1]));
+            leaf = InsertLeftChild(move(leaf), RestoreTree(left));
+            leaf = InsertRightChild(move(leaf), RestoreTree(right));
         }
-        auto leaf = make_unique<SmartTree>();
-        leaf->value = std::stoi(value);
-        value = "";
+
         return leaf;
     }
 }

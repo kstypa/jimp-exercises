@@ -9,7 +9,7 @@
 #include <string>
 #include <memory>
 #include <cstring>
-#include <cctype>
+#include <regex>
 
 namespace datastructures {
     typedef struct SmartTree{

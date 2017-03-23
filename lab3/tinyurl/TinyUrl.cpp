@@ -16,7 +16,7 @@ namespace tinyurl {
 
     string DecToBase62(int64_t dec){
         string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        string base62 = "";
+        string base62;
         while(dec > 0){
             base62 = digits[dec % 62] + base62;
             dec /= 62;

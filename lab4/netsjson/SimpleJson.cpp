@@ -12,9 +12,7 @@ using ::std::map;
 
 namespace nets {
 
-    JsonValue::JsonValue(){
-        key_ = "";
-    }
+    JsonValue::JsonValue():type_(""){}
 
     JsonValue::JsonValue(const string &value) {
         std::stringstream ss;
@@ -92,11 +90,7 @@ namespace nets {
             }
             objstr += "}";
             return objstr;
-        }/*
-        else if(type_ == "pair"){
-            string pairstr = "{" + key_ + ": " + sub_->ToString() + "}";
-            return pairstr;
-        }*/
+        }
         else
             return "";
     }

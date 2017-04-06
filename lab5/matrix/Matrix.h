@@ -13,23 +13,27 @@ namespace algebra {
     public:
         Matrix();
         Matrix(size_t rows, size_t cols);
-        Matrix(const std::initializer_list<std::vector<std::complex<double>>> &elements) : matrix_(elements) {}
+        Matrix(const std::initializer_list<std::vector<std::complex<double>>> &elements) : matrix_(elements) {
+            size_.first = matrix_.size();
+            size_.second = matrix_[0].size();
+        }
         Matrix(const Matrix &matrix);
-        Matrix(const std::string &str);
+        ~Matrix();
 
-        std::pair<size_t, size_t> Size();
-        std::complex<double> GetElement(size_t row, size_t col);
+        std::pair<size_t, size_t> Size() const;
+        std::complex<double> GetElement(size_t row, size_t col) const;
         void SetElement(size_t row, size_t col, std::complex<double> value);
 
-        Matrix Add(const Matrix &matrix);
-        Matrix Sub(const Matrix &matrix);
-        Matrix Mul(const Matrix &matrix);
-        Matrix Pow(int power);
+        Matrix Add(const Matrix &matrix) const;
+        Matrix Sub(const Matrix &matrix) const;
+        Matrix Mul(const Matrix &matrix) const;
+        Matrix Pow(int power) const;
 
-        void Print();
+        std::string Print() const;
 
     private:
         std::vector<std::vector<std::complex<double>>> matrix_;
+        std::pair<size_t, size_t> size_;
     };
 }
 

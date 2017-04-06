@@ -10,6 +10,7 @@ using ::std::endl;
 using ::algebra::Matrix;
 
 int main(int argc, char* argv[]){
+    /*
     Matrix m1(argv[1]);
     Matrix m2(argv[2]);
 
@@ -22,4 +23,11 @@ int main(int argc, char* argv[]){
     //cout << "Dzielenie" << (m1.Div(m2)).Print() << endl;
     cout << "Potęgowanie" << (m1.Pow(2)).Print() << endl;
     cout << "Potęgowanie" << (m2.Pow(2)).Print() << endl;
+     */
+
+    Matrix m{{1., 2.}, {5., 6.}};
+    Matrix m2{{1., 1.}, {1. ,1.}};
+    cout << m.Add(m2).Print() << endl;
+
+    return 0;
 }

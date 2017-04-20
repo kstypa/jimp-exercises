@@ -15,6 +15,8 @@ namespace datastructures {
     public:
         Word();
         Word(std::string str);
+        
+        std::string GetString() const;
 
         bool operator==(const Word &rhs) const;
         bool operator!=(const Word &rhs) const;
@@ -59,11 +61,15 @@ namespace datastructures {
 
         int operator[](std::string str) const;
 
+        friend std::ostream &operator<<(std::ostream &os, const WordCounter &wc);
+
     private:
         std::set<Word> words_;
         size_t total_;
         std::set<std::pair<Word, Counts>> counter_;
     };
+
+    std::ostream &operator<<(std::ostream &os, const WordCounter &wc);
 
 }
 

@@ -12,6 +12,7 @@ using ::std::endl;
 int main() {
     WordCounter wc {Word("a"), Word("b"), Word("a")};
     cout << endl << "total " << wc.TotalWords() << endl << "distinct " << wc.DistinctWords() << endl;
+    cout << wc;
 
     return 0;
 }

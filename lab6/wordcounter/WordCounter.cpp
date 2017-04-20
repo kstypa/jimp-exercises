@@ -3,6 +3,7 @@
 //
 
 #include <algorithm>
+#include <iostream>
 #include "WordCounter.h"
 
 namespace datastructures {
@@ -60,6 +61,10 @@ namespace datastructures {
 
     Word::Word(std::string str) {
         word_ = str;
+    }
+
+    std::string Word::GetString() const {
+        return word_;
     }
 
     bool Word::operator==(const Word &rhs) const {
@@ -125,4 +130,18 @@ namespace datastructures {
         return count;
     }
 
+    struct {
+        bool operator()(const std::pair<Word, Counts> &a, const std::pair<Word, Counts> &b)
+        {
+            return a.second.GetCount() > b.second.GetCount();
+        }
+    } CmpCount;
+
+    std::ostream &operator<<(std::ostream &os, const WordCounter &wc) {
+        std::vector<std::pair<Word, Counts>> sortedcounter(wc.counter_.begin(), wc.counter_.end());
+        std::sort(sortedcounter.begin(), sortedcounter.end(), CmpCount);
+        for(auto n : sortedcounter)
+            os << "word: " << n.first.GetString() << " count: " << n.second.GetCount() << std::endl;
+        return os;
+    }
 }

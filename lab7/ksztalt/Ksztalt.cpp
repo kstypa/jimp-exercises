@@ -45,12 +45,8 @@ void Kwadrat::rysuj() {
     }
 }
 
-Kolo::Kolo() : r_(0) {
+Kolo::Kolo() {
 
-}
-
-Kolo::Kolo(double r) {
-    r_ = r;
 }
 
 Kolo::~Kolo() {
@@ -58,6 +54,12 @@ Kolo::~Kolo() {
 }
 
 void Kolo::rysuj() {
-
+    std::cout << "    # # #     \n"
+            "  # # # # #   \n"
+            "# # # # # # # \n"
+            "# # # # # # # \n"
+            "# # # # # # # \n"
+            "  # # # # #   \n"
+            "    # # #     \n";
 }
 

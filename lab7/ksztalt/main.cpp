@@ -22,13 +22,13 @@ int main() {
     for(int i = 0; i < 10; i++) {
         int r = rand()%100;
         if(r < 33) {
-            ksztalty.push_back(new Trojkat(5));
+            ksztalty.push_back(new Trojkat(7));
         }
         else if(r >= 33 && r < 67) {
-            ksztalty.push_back(new Kwadrat(5));
+            ksztalty.push_back(new Kwadrat(7));
         }
         else {
-            ksztalty.push_back(new Kolo(5));
+            ksztalty.push_back(new Kolo());
         }
     }
 

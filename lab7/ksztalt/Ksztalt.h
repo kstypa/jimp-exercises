@@ -39,13 +39,10 @@ private:
 class Kolo : public Ksztalt {
 public:
     Kolo();
-    Kolo(double r);
     ~Kolo();
 
     virtual void rysuj();
 
-private:
-    double r_;
 };
 
 

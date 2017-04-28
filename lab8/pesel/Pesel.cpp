@@ -16,10 +16,7 @@ bool Checksum(std::string pesel) {
     for(int i = 0; i < 10; i++) {
         a += multipliers[i % 4] * (pesel[i] - 48);
     }
-    if(a % 10 != pesel[10] - 48)
-        return false;
-    else
-        return true;
+    return a % 10 == pesel[10] - 48;
 }
 
 void academia::Pesel::ValidatePesel(std::string pesel) {

@@ -2,6 +2,7 @@
 // Created by karol on 4/27/17.
 //
 
+#include <vector>
 #include "Pesel.h"
 
 academia::Pesel::Pesel(std::string pesel) {
@@ -10,8 +11,11 @@ academia::Pesel::Pesel(std::string pesel) {
 }
 
 bool Checksum(std::string pesel) {
-    int a = 9 * (pesel[0] - 48 + pesel[4] - 48 + pesel[8] - 48) + 7 * (pesel[1] - 48 + pesel[5] - 48 + pesel[9] - 48) +
-     3 * (pesel[2] - 48 + pesel[6] - 48) + pesel[3] - 48 + pesel[7] - 48;
+    int a = 0;
+    std::vector<int> multipliers = {9, 7, 3, 1};
+    for(int i = 0; i < 10; i++) {
+        a += multipliers[i % 4] * (pesel[i] - 48);
+    }
     if(a % 10 != pesel[10] - 48)
         return false;
     else

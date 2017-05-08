@@ -1,0 +1,111 @@
+//
+// Created by karol on 5/4/17.
+//
+
+#include <vector>
+#include "Serialization.h"
+
+namespace academia {
+
+//  ROOM
+
+    Room::Room(int id_, const std::string &name_, Room::Type type_) : id_(id_), name_(name_), type_(type_) {}
+
+    void Room::Serialize(Serializer *ser) const {
+        ser->Header("Room");
+        ser->IntegerField("id", id_);
+        ser->StringField("name", name_);
+        ser->StringField("type", TypeToString());
+        ser->Footer("Room");
+    }
+
+    std::string Room::TypeToString() const {
+        switch(type_) {
+            case Type::COMPUTER_LAB:
+                return "COMPUTER_LAB";
+            case Type::LECTURE_HALL:
+                return "LECTURE_HALL";
+            case Type::CLASSROOM:
+                return "CLASSROOM";
+        }
+    }
+
+//  BUILDING
+
+    Building::Building(int id_, const std::string &name_, const std::vector<Room> &rooms_) : id_(id_), name_(name_),
+                                                                                             rooms_(rooms_) {}
+
+    void Building::Serialize(Serializer *ser) const {
+
+    }
+
+//  XMLSERIALIZER
+
+    void XmlSerializer::IntegerField(const std::string &field_name, int value) {
+
+    }
+
+    void XmlSerializer::DoubleField(const std::string &field_name, double value) {
+
+    }
+
+    void XmlSerializer::StringField(const std::string &field_name, const std::string &value) {
+
+    }
+
+    void XmlSerializer::BooleanField(const std::string &field_name, bool value) {
+
+    }
+
+    void XmlSerializer::SerializableField(const std::string &field_name, const academia::Serializable &value) {
+
+    }
+
+    void XmlSerializer::ArrayField(const std::string &field_name,
+                                   const std::vector<std::reference_wrapper<const academia::Serializable>> &value) {
+
+    }
+
+    void XmlSerializer::Header(const std::string &object_name) {
+
+    }
+
+    void XmlSerializer::Footer(const std::string &object_name) {
+
+    }
+
+//  JSONSERIALIZER
+
+    void JsonSerializer::IntegerField(const std::string &field_name, int value) {
+
+    }
+
+    void JsonSerializer::DoubleField(const std::string &field_name, double value) {
+
+    }
+
+    void JsonSerializer::StringField(const std::string &field_name, const std::string &value) {
+
+    }
+
+    void JsonSerializer::BooleanField(const std::string &field_name, bool value) {
+
+    }
+
+    void JsonSerializer::SerializableField(const std::string &field_name, const academia::Serializable &value) {
+
+    }
+
+    void JsonSerializer::ArrayField(const std::string &field_name,
+                                    const std::vector<std::reference_wrapper<const academia::Serializable>> &value) {
+
+    }
+
+    void JsonSerializer::Header(const std::string &object_name) {
+
+    }
+
+    void JsonSerializer::Footer(const std::string &object_name) {
+
+    }
+}

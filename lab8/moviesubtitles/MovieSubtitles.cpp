@@ -136,8 +136,8 @@ namespace moviesubs {
             throw(std::invalid_argument("fps"));
         std::vector<std::string> lines;
         GetSubRipLinesFromStream(in, lines);
-        int LineNumber = 0, NewLineCount = 0, hours = 0, minutes = 0, seconds = 0, milliseconds = 0,
-                hours2 = 0, minutes2 = 0, seconds2 = 0, milliseconds2 = 0, overflow = 0;
+        int LineNumber = 0, hours = 0, minutes = 0, seconds = 0, milliseconds = 0,
+                hours2 = 0, minutes2 = 0, seconds2 = 0, milliseconds2 = 0, overflow = 0, timecheck = 0, timecheck2 = 0;
         std::string time, text;
         std::stringstream ss, timess;
         std::vector<size_t> NewLinePos;
@@ -146,18 +146,20 @@ namespace moviesubs {
                 continue;
             for(size_t j = 0; j < lines[i].size(); j++) {
                 if(lines[i][j] == '\n') {
-                    NewLineCount++;
                     NewLinePos.push_back(j);
                 }
             }
+
             LineNumber = std::stoi(lines[i].substr(0, NewLinePos[0]));
             if(LineNumber != i)
                 throw(OutOfOrderFrames());
+
             time = lines[i].substr(NewLinePos[0] + 1, NewLinePos[1] - NewLinePos[0] - 1);
-            text = lines[i].substr(NewLinePos[1] + 1, lines[i].size());
-            // hh:mm:ss,xxx --> hh:mm:ss,xxx
-            // 01234567890123456789012345678
-            // 0         1         2
+            if(time[8] != ',' || time[25] != ',')
+                throw(InvalidSubtitleLineFormat());
+            if(time[2] != ':' || time[5] != ':' || time[19] != ':' || time[22] != ':')
+                throw(InvalidSubtitleLineFormat());
+
             hours = std::stoi(time.substr(0, 2));
             minutes = std::stoi(time.substr(3, 2));
             seconds = std::stoi(time.substr(6, 2));
@@ -166,6 +168,13 @@ namespace moviesubs {
             minutes2 = std::stoi(time.substr(20, 2));
             seconds2 = std::stoi(time.substr(23, 2));
             milliseconds2 = std::stoi(time.substr(26, 3));
+
+            timecheck = 3600000 * hours + 60000 * minutes + 1000 * seconds + milliseconds + ms;
+            timecheck2 = 3600000 * hours2 + 60000 * minutes2 + 1000 * seconds2 + milliseconds2 + ms;
+            if(timecheck < 0 || timecheck2 < 0)
+                throw(NegativeFrameAfterShift());
+            if(timecheck > timecheck2)
+                throw(SubtitleEndBeforeStart(i, time));
 
             milliseconds += ms;
             if(milliseconds > 999) {
@@ -205,6 +214,8 @@ namespace moviesubs {
                    << ":" << std::setfill('0') << std::setw(2) << seconds2 << "," << std::setfill('0') << std::setw(3) << milliseconds2;
             time = timess.str();
             timess.str(std::string());
+
+            text = lines[i].substr(NewLinePos[1] + 1, lines[i].size());
 
             ss << LineNumber << "\n" << time << "\n" << text;
             lines[i] = ss.str();

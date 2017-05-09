@@ -3,6 +3,7 @@
 //
 
 #include <vector>
+#include <iomanip>
 #include "MovieSubtitles.h"
 
 namespace moviesubs {
@@ -135,8 +136,10 @@ namespace moviesubs {
             throw(std::invalid_argument("fps"));
         std::vector<std::string> lines;
         GetSubRipLinesFromStream(in, lines);
-        int LineNumber = 0, NewLineCount = 0;
+        int LineNumber = 0, NewLineCount = 0, hours = 0, minutes = 0, seconds = 0, milliseconds = 0,
+                hours2 = 0, minutes2 = 0, seconds2 = 0, milliseconds2 = 0, overflow = 0;
         std::string time, text;
+        std::stringstream ss, timess;
         std::vector<size_t> NewLinePos;
         for(size_t i = 0; i < lines.size(); i++) {
             if(lines[i] == "")
@@ -152,7 +155,60 @@ namespace moviesubs {
                 throw(OutOfOrderFrames());
             time = lines[i].substr(NewLinePos[0] + 1, NewLinePos[1] - NewLinePos[0] - 1);
             text = lines[i].substr(NewLinePos[1] + 1, lines[i].size());
+            // hh:mm:ss,xxx --> hh:mm:ss,xxx
+            // 01234567890123456789012345678
+            // 0         1         2
+            hours = std::stoi(time.substr(0, 2));
+            minutes = std::stoi(time.substr(3, 2));
+            seconds = std::stoi(time.substr(6, 2));
+            milliseconds = std::stoi(time.substr(9, 3));
+            hours2 = std::stoi(time.substr(17, 2));
+            minutes2 = std::stoi(time.substr(20, 2));
+            seconds2 = std::stoi(time.substr(23, 2));
+            milliseconds2 = std::stoi(time.substr(26, 3));
 
+            milliseconds += ms;
+            if(milliseconds > 999) {
+                overflow = milliseconds / 1000;
+                milliseconds %= 1000;
+                seconds += overflow;
+                if(seconds > 60) {
+                    overflow = seconds / 60;
+                    seconds %= 60;
+                    minutes += overflow;
+                    if(minutes > 60) {
+                        overflow = minutes / 60;
+                        minutes %= 60;
+                        hours += overflow;
+                    }
+                }
+            }
+            milliseconds2 += ms;
+            if(milliseconds2 > 999) {
+                overflow = milliseconds2 / 1000;
+                milliseconds2 %= 1000;
+                seconds2 += overflow;
+                if(seconds2 > 60) {
+                    overflow = seconds2 / 60;
+                    seconds2 %= 60;
+                    minutes2 += overflow;
+                    if(minutes2 > 60) {
+                        overflow = minutes2 / 60;
+                        minutes2 %= 60;
+                        hours2 += overflow;
+                    }
+                }
+            }
+            timess << std::setfill('0') << std::setw(2) << hours << ":" << std::setfill('0') << std::setw(2) << minutes
+                   << ":" << std::setfill('0') << std::setw(2) << seconds << "," << std::setfill('0') << std::setw(3) << milliseconds
+                   << " --> " << std::setfill('0') << std::setw(2) << hours2 << ":" << std::setfill('0') << std::setw(2) << minutes2
+                   << ":" << std::setfill('0') << std::setw(2) << seconds2 << "," << std::setfill('0') << std::setw(3) << milliseconds2;
+            time = timess.str();
+            timess.str(std::string());
+
+            ss << LineNumber << "\n" << time << "\n" << text;
+            lines[i] = ss.str();
+            ss.str(std::string());
             *out << lines[i] << "\n";
         }
     }

@@ -7,7 +7,7 @@
 
 namespace moviesubs {
 
-    void GetLinesFromStream(std::stringstream *in, std::vector<std::string> &lines) {
+    void GetMicroDVDLinesFromStream(std::stringstream *in, std::vector<std::string> &lines) {
         std::string input = in->str();
         std::string CurrentLine;
         int LineCount = 1;
@@ -29,7 +29,7 @@ namespace moviesubs {
         int FrameTime = 1000 / fps;
         int shift = ms / FrameTime;
         std::vector<std::string> lines;
-        GetLinesFromStream(in, lines);
+        GetMicroDVDLinesFromStream(in, lines);
         int start = 0, stop = 0, lbracecount = 0, rbracecount = 0;
         size_t startleft = 0, startright = 0, stopleft = 0, stopright = 0;
         std::string text, startstr, stopstr;
@@ -93,10 +93,68 @@ namespace moviesubs {
         }
     }
 
-
+    void GetSubRipLinesFromStream(std::stringstream *in, std::vector<std::string> &lines) {
+        std::string input = in->str();
+        std::string CurrentLine;
+        std::stringstream ss;
+        std::vector<int> InnerCounts;
+        InnerCounts.push_back(0);
+        int LineCount = 1, inner = 0;
+        for(size_t j = 1; j < input.size(); j++) {
+            if((input[j] == '\n' && input[j-1] == '\n')) {
+                InnerCounts.push_back(inner);
+                inner = 0;
+                LineCount++;
+            }
+            else if(input[j] == '\n' && j == input.size()-1) {
+                inner++;
+                InnerCounts.push_back(inner);
+                inner = 0;
+                LineCount++;
+            }
+            else if(input[j] == '\n' && input[j-1] != '\n')
+                inner++;
+            else if(input[j] != '\n' && input[j-1] != '\n')
+                continue;
+        }
+        for(int i = 0; i < LineCount; i++) {
+            for(size_t k = 0; k < InnerCounts[i]; k++) {
+                std::getline(*in, CurrentLine);
+                if(CurrentLine.size() == 0)
+                    std::getline(*in, CurrentLine);
+                ss << CurrentLine << "\n";
+                CurrentLine = "";
+            }
+            lines.push_back(ss.str());
+            ss.str(std::string());
+        }
+    }
 
     void SubRipSubtitles::ShiftAllSubtitlesBy(int ms, int fps, std::stringstream *in, std::stringstream *out) const {
+        if(fps <= 0)
+            throw(std::invalid_argument("fps"));
+        std::vector<std::string> lines;
+        GetSubRipLinesFromStream(in, lines);
+        int LineNumber = 0, NewLineCount = 0;
+        std::string time, text;
+        std::vector<size_t> NewLinePos;
+        for(size_t i = 0; i < lines.size(); i++) {
+            if(lines[i] == "")
+                continue;
+            for(size_t j = 0; j < lines[i].size(); j++) {
+                if(lines[i][j] == '\n') {
+                    NewLineCount++;
+                    NewLinePos.push_back(j);
+                }
+            }
+            LineNumber = std::stoi(lines[i].substr(0, NewLinePos[0]));
+            if(LineNumber != i)
+                throw(OutOfOrderFrames());
+            time = lines[i].substr(NewLinePos[0] + 1, NewLinePos[1] - NewLinePos[0] - 1);
+            text = lines[i].substr(NewLinePos[1] + 1, lines[i].size());
 
+            *out << lines[i] << "\n";
+        }
     }
 
     NegativeFrameAfterShift::NegativeFrameAfterShift() : runtime_error("Negative frame after shift") {

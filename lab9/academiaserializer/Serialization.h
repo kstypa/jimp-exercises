@@ -39,14 +39,14 @@ namespace academia {
 
     class Building : public Serializable {
     public:
-        Building(int id_, const std::string &name_, const std::vector<Room> &rooms_);
+        Building(int id_, const std::string &name_, const std::vector<std::reference_wrapper<const Serializable>> &rooms_);
 
         void Serialize(Serializer *ser) const override;
 
     private:
         int id_;
         std::string name_;
-        std::vector<Room> rooms_;
+        std::vector<std::reference_wrapper<const Serializable>> rooms_;
     };
 
     class Serializer {

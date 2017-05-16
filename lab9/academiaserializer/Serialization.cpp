@@ -9,7 +9,7 @@ namespace academia {
 
     bool comma = false;
 
-//  ROOM
+//  Room
 
     Room::Room(int id_, const std::string &name_, Room::Type type_) : id_(id_), name_(name_), type_(type_) {}
 
@@ -34,9 +34,9 @@ namespace academia {
         }
     }
 
-//  BUILDING
+//  Building
 
-    Building::Building(int id_, const std::string &name_, const std::vector<std::reference_wrapper<const Serializable>> &rooms_) : id_(id_), name_(name_),
+    Building::Building(int id_, const std::string &name_, std::vector<Room> rooms_) : id_(id_), name_(name_),
                                                                                              rooms_(rooms_) {}
 
     void Building::Serialize(Serializer *ser) const {
@@ -45,12 +45,17 @@ namespace academia {
         ser->IntegerField("id", id_);
         comma = true;
         ser->StringField("name", name_);
-        ser->ArrayField("rooms", rooms_);
+        std::vector<std::reference_wrapper<const Serializable>> RoomsReferenceWrapper(rooms_.begin(), rooms_.end());
+        ser->ArrayField("rooms", RoomsReferenceWrapper);
         ser->Footer("building");
         comma = false;
     }
 
-//  XMLSERIALIZER
+    int Building::Id() const {
+        return id_;
+    }
+
+//  XmlSerializer
 
     void XmlSerializer::IntegerField(const std::string &field_name, int value) {
         *out_ << "<" << field_name << ">" << value << "<\\" << field_name << ">";
@@ -90,7 +95,7 @@ namespace academia {
         *out_ << "<\\" << object_name << ">";
     }
 
-//  JSONSERIALIZER
+//  JsonSerializer
 
     void JsonSerializer::IntegerField(const std::string &field_name, int value) {
         if(comma)
@@ -146,4 +151,27 @@ namespace academia {
     void JsonSerializer::Footer(const std::string &object_name) {
         *out_ << "}";
     }
+
+//    BuildingRepository
+
+    BuildingRepository::BuildingRepository(const std::initializer_list<Building> buildings) : buildings_(buildings) {}
+
+    void BuildingRepository::StoreAll(Serializer *ser) const {
+        ser->Header("building_repository");
+        std::vector<std::reference_wrapper<const Serializable>> BuildingsReferenceWrapper(buildings_.begin(), buildings_.end());
+        ser->ArrayField("buildings", BuildingsReferenceWrapper);
+        ser->Footer("building_repository");
+    }
+
+    void BuildingRepository::Add(const Building &building) {
+        buildings_.emplace_back(building);
+    }
+
+    std::experimental::optional<Building> BuildingRepository::operator[](int id) const {
+        for(auto n : buildings_)
+            if(n.Id() == id)
+                return std::experimental::make_optional(n);
+        return {};
+    }
+
 }

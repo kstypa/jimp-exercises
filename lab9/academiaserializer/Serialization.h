@@ -9,6 +9,8 @@
 #include <functional>
 #include <vector>
 #include <iostream>
+#include <experimental/optional>
+#include <initializer_list>
 
 namespace academia {
 
@@ -39,14 +41,28 @@ namespace academia {
 
     class Building : public Serializable {
     public:
-        Building(int id_, const std::string &name_, const std::vector<std::reference_wrapper<const Serializable>> &rooms_);
+        Building(int id_, const std::string &name_, std::vector<Room> rooms_);
 
         void Serialize(Serializer *ser) const override;
+        int Id() const;
 
     private:
         int id_;
         std::string name_;
-        std::vector<std::reference_wrapper<const Serializable>> rooms_;
+        std::vector<Room> rooms_;
+    };
+
+    class BuildingRepository {
+    public:
+        BuildingRepository(const std::initializer_list<Building> buildings);
+
+        void StoreAll(Serializer *ser) const;
+        void Add(const Building &building);
+
+        std::experimental::optional<Building> operator[](int id) const;
+
+    private:
+        std::vector<Building> buildings_;
     };
 
     class Serializer {

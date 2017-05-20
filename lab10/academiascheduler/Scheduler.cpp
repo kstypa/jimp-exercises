@@ -95,23 +95,18 @@ namespace academia {
                                                  const std::map<int, std::set<int>> &courses_of_year,
                                                  int n_time_slots) {
         Schedule NewSchedule;
-        int year, teacher, time_slot, c_needed_slots = 0, t_needed_slots = 0;
+        int year, teacher, time_slot = 0, needed_slots = 0;
         bool inserted, slot_found;
 
         if(NewSchedule.AvailableTimeSlots(n_time_slots).size() <= 0)
             throw NoViableSolutionFound();
 
-        for(auto x : courses_of_year) {
-            for(auto y : x.second)
-                ++c_needed_slots;
-        }
-
         for(auto x : teacher_courses_assignment) {
             for(auto y : x.second)
-                ++t_needed_slots;
+                ++needed_slots;
         }
 
-        if(c_needed_slots > (n_time_slots * rooms.size()) || t_needed_slots > (n_time_slots * rooms.size()))
+        if(needed_slots > (n_time_slots * rooms.size()))
             throw NoViableSolutionFound();
 
         for(auto t : teacher_courses_assignment) {
@@ -124,8 +119,6 @@ namespace academia {
                 inserted = false;
 
                 for(auto room : rooms) {
-                    if(NewSchedule.OfRoom(room).AvailableTimeSlots(n_time_slots).size() <= 0)
-                        throw NoViableSolutionFound();
 
                         for(auto n : courses_of_year) {
                             year = n.first;
@@ -150,10 +143,9 @@ namespace academia {
                                 }
                                 if(slot_found) break;
                             }
-                            if(!slot_found) throw NoViableSolutionFound();
 
                             for(auto c : n.second) {
-                                if(c == course) {
+                                if(c == course  && slot_found) {
                                     NewSchedule.InsertScheduleItem(SchedulingItem{course, teacher, room, time_slot, year});
                                     inserted = true;
                                     break;
@@ -161,7 +153,6 @@ namespace academia {
                             }
                             if(inserted) break;
                         }
-                        if(!inserted) throw NoViableSolutionFound();
                     if(inserted) break;
                 }
             }

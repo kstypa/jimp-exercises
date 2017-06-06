@@ -21,6 +21,11 @@ namespace tree {
         void InsertIterative(T value);
         void PrintTreeInOrder() const;
 
+        T Value() const;
+        int Size() const;
+        int Depth() const;
+        Tree<T> Root() const;
+
     private:
         T value_;
         std::unique_ptr<Tree<T>> left_;
@@ -95,6 +100,43 @@ namespace tree {
         std::cout << value_ << std::endl;
         if(right_ != nullptr)
             right_->PrintTreeInOrder();
+    }
+
+    template<class T>
+    T Tree<T>::Value() const {
+        return value_;
+    }
+
+    template<class T>
+    int Tree<T>::Size() const {
+        int size = 1;
+        if(left_)
+            size += left_->Size();
+        if(right_)
+            size += right_->Size();
+        return size;
+    }
+
+    template<class T>
+    int Tree<T>::Depth() const {
+        int depth = 1, LeftDepth = 0, RightDepth = 0;
+
+        if(left_)
+            LeftDepth = left_->Depth();
+        if(right_)
+            RightDepth = right_->Depth();
+
+        if (LeftDepth > RightDepth)
+            depth += LeftDepth;
+        else
+            depth += RightDepth;
+
+        return depth;
+    }
+
+    template<class T>
+    Tree<T> Tree<T>::Root() const {
+        return this;
     }
 
 }
